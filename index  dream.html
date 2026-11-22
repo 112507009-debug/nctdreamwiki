@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NCT DREAM LLM Wiki 知識庫</title>
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --sidebar-w: 280px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+    /* Sidebar */
+    aside {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      z-index: 10;
+    }
+    .brand {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px 10px;
+    }
+    .nav-group-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      padding: 10px 12px 6px;
+    }
+    .nav-item {
+      display: block;
+      padding: 10px 14px;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-item:hover {
+      background: #f1f5f9;
+      color: var(--primary-dark);
+    }
+    .nav-item.active {
+      background: #ecfdf5;
+      color: var(--primary-dark);
+      font-weight: 600;
+    }
+    .sidebar-footer {
+      padding: 15px;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #ecfdf5;
+      color: var(--primary-dark);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Main Content */
+    main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      padding: 40px 60px;
+      max-width: 1000px;
+    }
+    .article-header {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .article-header h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .tags {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .tag {
+      background: #f1f5f9;
+      color: #475569;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+    .content-section {
+      display: none;
+      line-height: 1.75;
+      font-size: 1.02rem;
+      color: #334155;
+    }
+    .content-section.active {
+      display: block;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h3 {
+      font-size: 1.35rem;
+      color: #0f172a;
+      margin: 28px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed var(--border);
+    }
+    h4 {
+      font-size: 1.1rem;
+      color: #1e293b;
+      margin: 20px 0 8px;
+    }
+    p { margin-bottom: 16px; }
+    ul, ol {
+      margin-bottom: 20px;
+      padding-left: 24px;
+    }
+    li { margin-bottom: 8px; }
+    strong { color: #0f172a; }
+    .card-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 20px 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .card-box.highlight {
+      border-left: 4px solid var(--primary);
+      background: #f0fdf4;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      background: var(--surface);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: #475569;
+    }
+    tr:last-child td { border-bottom: none; }
+    .wiki-link {
+      color: var(--primary-dark);
+      text-decoration: underline;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .wiki-link:hover { color: #047857; }
+    .btn-presentation {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .btn-presentation:hover { background: var(--primary-dark); }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside>
+    <div class="brand">
+      <h1>🌱 NCT DREAM Wiki</h1>
+      <p>結構化 LLM 知識庫 (Knowledge Base)</p>
+      <a href="presentation.html" class="btn-presentation">👉 打開教學簡報</a>
+    </div>
+    <nav>
+      <div class="nav-group-title">目錄總覽</div>
+      <div class="nav-item active" onclick="switchTab('home')">🏠 知識庫首頁 (Index)</div>
+
+      <div class="nav-group-title">核心百科條目</div>
+      <div class="nav-item" onclick="switchTab('profile')">01. 團體概述與定位</div>
+      <div class="nav-item" onclick="switchTab('evolution')">02. 體制演進與 2026 新篇</div>
+      <div class="nav-item" onclick="switchTab('members')">03. 成員檔案 (6+1)</div>
+      <div class="nav-item" onclick="switchTab('music')">04. 音樂風格四部曲</div>
+      <div class="nav-item" onclick="switchTab('heritage')">05. 銷量、巡演與影響力</div>
+
+      <div class="nav-group-title">原始攝取資料 (Ingested)</div>
+      <div class="nav-item" onclick="switchTab('sources')">📑 5 篇原始資料來源</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div>狀態：<span class="badge">已完成 Ingestion</span></div>
+      <div style="margin-top: 4px;">雙擊此 HTML 即可在任何瀏覽器開啟</div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main>
+
+    <!-- SECTION: HOME -->
+    <div id="sec-home" class="content-section active">
+      <div class="article-header">
+        <h2>NCT DREAM 結構化 LLM Wiki</h2>
+        <p>由 5 篇專業資料經由 LLM 交叉比對、去蕪存菁後建立之專屬知識庫。</p>
+        <div class="tags">
+          <span class="tag">#LLM_Wiki</span>
+          <span class="tag">#7DREAM</span>
+          <span class="tag">#DREAM_AFTER_DREAM</span>
+          <span class="tag">#知識圖譜</span>
+        </div>
+      </div>
+
+      <div class="card-box highlight">
+        <h3>💡 知識庫設計說明</h3>
+        <p>本 Wiki 不僅收錄 NCT DREAM 的基礎背景，更精準記錄了其在 K-POP 歷史上獨特的<strong>「畢業制度逆轉」</strong>與<strong>「青少年成長共同體」</strong>文化。透過結構化標籤與交叉關聯，為後續教學簡報提供了最精確的知識來源。</p>
+      </div>
+
+      <h3>🗺️ 知識庫架構導覽</h3>
+      <ul>
+        <li><span class="wiki-link" onclick="switchTab('profile')">01. 團體概述與定位</span>：創團精神、青少年聯合隊初衷、最強核心粉絲群（Core Fandom）。</li>
+        <li><span class="wiki-link" onclick="switchTab('evolution')">02. 體制變革史</span>：2016 畢業制 $\rightarrow$ 2020 畢業制廢除與 7DREAM $\rightarrow$ 2026 年 Mark 約滿離隊與現行 6 人體制「DREAM AFTER DREAM」。</li>
+        <li><span class="wiki-link" onclick="switchTab('members')">03. 成員名冊</span>：現役 6 位成員（仁俊、Jeno、楷燦、渽民、辰樂、志晟）全方位剖析 + 初代隊長 Mark 的歷史貢獻。</li>
+        <li><span class="wiki-link" onclick="switchTab('music')">04. 音樂風格四部曲</span>：從《Chewing Gum》泡泡糖少年感，到《BOOM》微熟，再到《Hot Sauce》、《ISTJ》、《DREAM( )SCAPE》。</li>
+        <li><span class="wiki-link" onclick="switchTab('heritage')">05. 紀錄與文化遺產</span>：Triple Million Seller 銷量奇蹟、首爾蠶室奧林匹克主競技場開唱與大賞榮譽。</li>
+      </ul>
+    </div>
+
+    <!-- SECTION: PROFILE -->
+    <div id="sec-profile" class="content-section">
+      <div class="article-header">
+        <h2>01. 團體概述與青少年定位</h2>
+        <div class="tags"><span class="tag">#青少年聯合隊</span><span class="tag">#粉絲文化</span><span class="tag">#核心凝聚力</span></div>
+      </div>
+      <div class="card-box">
+        <strong>團隊基本資訊：</strong>
+        <ul>
+          <li><strong>出道時間：</strong>2016 年 8 月 25 日（出道曲《Chewing Gum》）</li>
+          <li><strong>所屬經紀：</strong>SM Entertainment（NCT 旗下常駐子團）</li>
+          <li><strong>加油口號：</strong><code>Yo~ DREAM! 쩔어주자 화이팅!</code>（炸裂吧 Fighting!）</li>
+        </ul>
+      </div>
+      <h3>青少年聯合隊（청소년 연합팀）企劃哲學</h3>
+      <p>NCT DREAM 出道時全員皆為 10 代（未成年），平均年齡僅 15.6 歲。這個企劃實現了 SM 早期自 H.O.T 時代便想探索的「全青少年組合」概念，向同時代的 10 代聽眾傳達夢想與勇氣。</p>
+      <h3>全團最強核心死忠粉絲群（Core Fandom）</h3>
+      <p>在 NCT 龐大的體系中，NCT DREAM 擁有黏著度與忠誠度最高的粉絲群體。因為成員變動極少，粉絲們是「親眼看著這群男孩在鏡頭前長大成人」。這種共同陪伴的長度，塑造了不可撼動的情感紐帶（유대성）。</p>
+    </div>
+
+    <!-- SECTION: EVOLUTION -->
+    <div id="sec-evolution" class="content-section">
+      <div class="article-header">
+        <h2>02. 體制變革：畢業制、7DREAM 到 2026 新篇</h2>
+        <div class="tags"><span class="tag">#畢業制廢除</span><span class="tag">#7DREAM</span><span class="tag">#DREAM_AFTER_DREAM</span></div>
+      </div>
+      <div class="card-box highlight">
+        <strong>⚡ 歷史與現況的明確界定：</strong>
+        <p>過去與現在需清楚區分。2026 年 11 月現行 NCT DREAM 由 <strong>仁俊、Jeno、楷燦、渽民、辰樂、志晟</strong> 6 名成員組成。Mark 於 2026 年 4 月專屬合約期滿結束 NCT 活動。過去 7DREAM 的記憶化為不可替代的精神象徵，6 位成員正開啟《DREAM AFTER DREAM》的新篇章。</p>
+      </div>
+      <h3>三大歷史階段時間線</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>年份</th>
+            <th>體制階段</th>
+            <th>關鍵歷史事件</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>2016 - 2018</strong></td>
+            <td>滿 20 歲畢業制</td>
+            <td>全員 10 代出道；2018 年大哥 Mark 達到年齡上限宣布畢業，引發粉絲與成員強烈情感衝擊。</td>
+          </tr>
+          <tr>
+            <td><strong>2020 - 2025</strong></td>
+            <td>畢業制廢除 & 7DREAM 盛世</td>
+            <td>SM 正式取消畢業換血體制，Mark 重新歸隊。7DREAM 發行《Hot Sauce》狂賣數百萬張，登上頂峰。</td>
+          </tr>
+          <tr>
+            <td><strong>2026 ~</strong></td>
+            <td>DREAM AFTER DREAM</td>
+            <td>Mark 於 4 月約滿結束活動；6 名成員確立為常駐體制，帶著過往沉澱的情感，展開成熟新航程。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECTION: MEMBERS -->
+    <div id="sec-members" class="content-section">
+      <div class="article-header">
+        <h2>03. 成員檔案：現役 6 人與榮譽成員</h2>
+        <div class="tags"><span class="tag">#成員定位</span><span class="tag">#6人體制</span><span class="tag">#Mark</span></div>
+      </div>
+      <h3>現役 6 位成員（2026 現行陣容）</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>成員藝名</th>
+            <th>生日</th>
+            <th>隊內職責</th>
+            <th>核心特點與音樂亮點</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>仁俊 (RENJUN)</strong></td>
+            <td>2000.03.23</td>
+            <td>主唱、主舞</td>
+            <td>清亮透明的高音音色，情感表達極其細膩，隊內的感性藝術靈魂。</td>
+          </tr>
+          <tr>
+            <td><strong>Jeno (제노)</strong></td>
+            <td>2000.04.23</td>
+            <td>領 Rapper、領舞</td>
+            <td>陽光笑眼與雕塑級肌肉線條的反差，舞台爆發力極強，多首收錄曲 Rap 詞作者。</td>
+          </tr>
+          <tr>
+            <td><strong>楷燦 (HAECHAN)</strong></td>
+            <td>2000.06.06</td>
+            <td>主唱、領舞</td>
+            <td>極具辨識度的「蜜糖嗓音（Honey Vocal）」，天生的節奏律動感與綜藝靈魂。</td>
+          </tr>
+          <tr>
+            <td><strong>渽民 (JAEMIN)</strong></td>
+            <td>2000.08.13</td>
+            <td>領 Rapper、門面</td>
+            <td>沉穩磁性的低音砲 Rap，極致的粉絲之愛（粉絲傻瓜）與獨具一格的個人審美。</td>
+          </tr>
+          <tr>
+            <td><strong>辰樂 (CHENLE)</strong></td>
+            <td>2001.11.22</td>
+            <td>主唱</td>
+            <td>寬廣雄厚的發聲共鳴，古典流行兼備的大氣唱腔，爽朗直率的高音感染力。</td>
+          </tr>
+          <tr>
+            <td><strong>志晟 (JISUNG)</strong></td>
+            <td>2002.02.05</td>
+            <td>主舞、忙內</td>
+            <td>頂級街舞舞蹈底子（Popping/Locking），從最稚嫩的忙內成長為高大沉穩的主舞。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>榮譽與歷史隊長：Mark（마크）</h3>
+      <p>1999 年生，擔任初代隊長與主 Rapper。領導團隊度過出道初期與 7DREAM 登頂盛世。其出色的 Rap 創作定義了團隊初中期的標誌風格。2026 年 4 月約滿結束活動，精神長存於隊史之中。</p>
+    </div>
+
+    <!-- SECTION: MUSIC -->
+    <div id="sec-music" class="content-section">
+      <div class="article-header">
+        <h2>04. 音樂風格四部曲與代表作</h2>
+        <div class="tags"><span class="tag">#音樂風格</span><span class="tag">#代表作</span><span class="tag">#概念演進</span></div>
+      </div>
+      <h3>一、少年純真期（2016-2017）</h3>
+      <p><strong>《Chewing Gum》</strong>（踩平衡車排舞、糖果系流行曲）、<strong>《My First and Last》</strong>（Funk Pop 青春初戀，奪得團體生涯首座打歌節目一位）。</p>
+      <h3>二、叛逆與成年轉折期（2018-2020）</h3>
+      <p><strong>《GO》</strong>（首次打破框架的 Trap Hip-hop 反叛曲）、<strong>《BOOM》</strong>（微熟節制都市性感節奏，告別稚嫩）。</p>
+      <h3>三、7DREAM 登頂與內在省思（2021-2024）</h3>
+      <p><strong>《Hot Sauce》</strong>（Afrobeat 洗腦副歌，突破百萬銷量）、<strong>《Candy》</strong>（翻唱 H.O.T 傳奇歌曲，達成音源榜 All Kill）、<strong>《ISTJ》</strong>（MBTI 主題實驗舞曲）、<strong>《DREAM( )SCAPE》</strong>（直面青春陣痛與自我救贖）。</p>
+      <h3>四、DREAM AFTER DREAM 時代（2026~）</h3>
+      <p>6 人體制展現更沉穩成熟的生命力，兼具強悍刀群舞與深層情感敘事。</p>
+    </div>
+
+    <!-- SECTION: HERITAGE -->
+    <div id="sec-heritage" class="content-section">
+      <div class="article-header">
+        <h2>05. 紀錄里程碑、世界巡演與文化影響力</h2>
+        <div class="tags"><span class="tag">#銷量奇蹟</span><span class="tag">#THE_DREAM_SHOW</span><span class="tag">#大賞</span></div>
+      </div>
+      <div class="card-box highlight">
+        <h3>🏆 核心銷量紀錄</h3>
+        <ul>
+          <li><strong>Triple Million Seller：</strong>正規一輯《Hot Sauce》及改版累計突破 300 萬張銷量。</li>
+          <li><strong>預售突破 420 萬張：</strong>正規三輯《ISTJ》刷新 SM 娛樂歷代最高預售紀錄。</li>
+          <li><strong>國民級音源回響：</strong>《Candy》橫掃韓國最大音源 MelOn 等多榜冠軍。</li>
+        </ul>
+      </div>
+      <h3>🏟️ 世界巡演：THE DREAM SHOW</h3>
+      <p>從 2019 年小型體育館起步，2022 年成功登上韓國最具指標性的最高殿堂——<strong>首爾奧林匹克主競技場（蠶室主競技場）</strong>，隨後展開遍及全球各大洲的頂級體育場巡演。</p>
+      <h3>🌟 精神文化遺產</h3>
+      <p>NCT DREAM 證明了「真實的人性情誼與成長故事」能夠戰勝「冰冷的企劃換血體制」，成為 K-POP 偶像史上極具代表性的青春傳奇。</p>
+    </div>
+
+    <!-- SECTION: SOURCES -->
+    <div id="sec-sources" class="content-section">
+      <div class="article-header">
+        <h2>📑 5 篇原始 Ingest 資料清單</h2>
+        <p>此處為本知識庫所萃取之 5 篇原始資料文件。</p>
+      </div>
+      <ul>
+        <li><strong>資料 1：</strong><a href="sources/source_1_overview.md" target="_blank">source_1_overview.md</a> - 團體基本概況與青少年聯合隊定位</li>
+        <li><strong>資料 2：</strong><a href="sources/source_2_system_evolution.md" target="_blank">source_2_system_evolution.md</a> - 體制變革史（含韓文資料翻譯與 2026 DREAM AFTER DREAM）</li>
+        <li><strong>資料 3：</strong><a href="sources/source_3_members.md" target="_blank">source_3_members.md</a> - 現役 6 位成員詳細檔案與 Mark 歷史角色</li>
+        <li><strong>資料 4：</strong><a href="sources/source_4_discography.md" target="_blank">source_4_discography.md</a> - 音樂演進四階段與經典主打</li>
+        <li><strong>資料 5：</strong><a href="sources/source_5_achievements.md" target="_blank">source_5_achievements.md</a> - 銷量奇蹟、巡演軌跡與大賞紀錄</li>
+      </ul>
+    </div>
+
+  </main>
+
+  <script>
+    function switchTab(id) {
+      document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      const target = document.getElementById('sec-' + id);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      event.currentTarget.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
